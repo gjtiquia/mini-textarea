@@ -4,13 +4,25 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <link rel="stylesheet" href="src/style.css">
   <title>mini &lt;textarea/&gt;</title>
 </head>
 
-<body>
-  <h1>mini <code>&lt;textarea/&gt;</code></h1>
-  <h2>a fast, simple <code>&lt;textarea/&gt;</code> that just works</h2>
-  <textarea></textarea>
+<body class="h-dvh p-4 flex flex-col items-center">
+  <h1 class="font-bold text-3xl">
+    mini <code>&lt;textarea/&gt;</code>
+  </h1>
+  <h2 class="pb-4">
+    a fast, simple <code>&lt;textarea/&gt;</code> that just works
+  </h2>
+  <textarea class="
+      flex-grow w-full max-w-screen-md 
+      border-2 border-gray-500 
+      rounded-md
+      resize-none
+      p-1
+    ">
+  </textarea>
 </body>
 
 </html>

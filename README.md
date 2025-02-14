@@ -8,7 +8,7 @@ https://mini-textarea.netlify.app/
 
 This project is set up with [Vite](https://vite.dev/) using the TypeScript Vanilla template.
 
-`npm run install`: Install dependencies
+`npm install`: Install dependencies
 
 `npm run dev`: Development Mode with Hot Module Replacement (HMR)
 

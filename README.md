@@ -4,15 +4,24 @@ a fast, simple &lt;textarea/&gt; that just works
 
 https://mini-textarea.netlify.app/
 
-## Commands
+this project is set up with [Vite](https://vite.dev/) using the TypeScript Vanilla template.
 
-This project is set up with [Vite](https://vite.dev/) using the TypeScript Vanilla template.
+### Commands
 
-`npm install`: Install dependencies
+- [Node.js](https://nodejs.org/) (v18 or higher recommended)
+- [pnpm](https://pnpm.io/) (v8 or higher)
 
-`npm run dev`: Development Mode with Hot Module Replacement (HMR)
+```bash
+# Install dependencies
+pnpm install
 
-`npm run build`: Build for production
+# Start development server with Hot Module Replacement (HMR)
+pnpm dev
 
-`npm run preview`: Preview production build
+# Build for production
+pnpm build
+
+# Preview production build
+pnpm preview
+```
 

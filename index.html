@@ -8,6 +8,15 @@
   <meta name="description" content="a fast, simple textarea that just works">
   <meta name="author" content="GJ Tiquia">
 
+  <!-- Prevent flash of wrong theme -->
+  <script>
+    // Check localStorage first
+    const darkMode = localStorage.getItem('darkMode');
+    if (darkMode === 'dark' || (darkMode === null && window.matchMedia('(prefers-color-scheme: dark)').matches)) {
+      document.documentElement.classList.add('dark');
+    }
+  </script>
+
   <link rel="stylesheet" href="src/style.css">
 
   <title>mini textarea</title>
@@ -52,17 +61,6 @@
       // Save preference to localStorage
       const isDark = document.documentElement.classList.contains('dark');
       localStorage.setItem('darkMode', isDark ? 'dark' : 'light');
-    }
-
-    // Check for saved user preference, if any, on load of the website
-    const darkMode = localStorage.getItem('darkMode');
-    // If no preference is set, check system preference
-    if (darkMode === null) {
-      if (window.matchMedia('(prefers-color-scheme: dark)').matches) {
-        document.documentElement.classList.add('dark');
-      }
-    } else if (darkMode === 'dark') {
-      document.documentElement.classList.add('dark');
     }
   </script>
 </body>

@@ -6,7 +6,7 @@ https://mini-textarea.netlify.app/
 
 this project is set up with [Vite](https://vite.dev/) using the TypeScript Vanilla template.
 
-### Commands
+## Commands
 
 - [Node.js](https://nodejs.org/) (v18 or higher recommended)
 - [pnpm](https://pnpm.io/) (v8 or higher)
@@ -25,3 +25,7 @@ pnpm build
 pnpm preview
 ```
 
+## TODO
+
+- [ ] proper domain
+- [ ] PWA setup

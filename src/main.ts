@@ -33,6 +33,12 @@ document.addEventListener('DOMContentLoaded', () => {
             }
             // If text is selected, let the default cut behavior work
         }
+
+        // Check for Alt+Up/Down to move line
+        if (event.altKey && (event.key === 'ArrowUp' || event.key === 'ArrowDown')) {
+            event.preventDefault(); // Prevent default behavior
+            moveCurrentLine(textarea, event.key === 'ArrowUp' ? 'up' : 'down');
+        }
     });
 });
 
@@ -121,6 +127,72 @@ function cutLine(textarea: HTMLTextAreaElement): void {
         .catch(err => {
             console.error('Failed to cut line: ', err);
         });
+}
+
+/**
+ * Move the current line up or down
+ */
+function moveCurrentLine(textarea: HTMLTextAreaElement, direction: 'up' | 'down'): void {
+    const text = textarea.value;
+    const cursorPos = textarea.selectionStart;
+
+    // Find current line boundaries
+    const currentLine = findLineBoundaries(text, cursorPos);
+
+    // Calculate the relative cursor position within the current line
+    const relativePos = cursorPos - currentLine.start;
+
+    // Split text into lines
+    const lines = text.split('\n');
+
+    // Find the line index based on line boundaries
+    let lineIndex = 0;
+    let charCount = 0;
+
+    for (let i = 0; i < lines.length; i++) {
+        const lineLength = lines[i].length;
+        if (charCount <= currentLine.start && currentLine.start <= charCount + lineLength) {
+            lineIndex = i;
+            break;
+        }
+        charCount += lineLength + 1; // +1 for the newline character
+    }
+
+    // Check if we can move in the desired direction
+    if ((direction === 'up' && lineIndex === 0) ||
+        (direction === 'down' && lineIndex === lines.length - 1)) {
+        return; // Cannot move further in this direction
+    }
+
+    // Determine the target line index
+    const targetIndex = direction === 'up' ? lineIndex - 1 : lineIndex + 1;
+
+    // Swap the lines
+    const temp = lines[lineIndex];
+    lines[lineIndex] = lines[targetIndex];
+    lines[targetIndex] = temp;
+
+    // Rejoin the text
+    const newText = lines.join('\n');
+    textarea.value = newText;
+
+    // Calculate new cursor position
+    let newCursorPos = 0;
+
+    // Count characters up to the target line
+    for (let i = 0; i < targetIndex; i++) {
+        newCursorPos += lines[i].length + 1; // +1 for newline
+    }
+
+    // Add the relative position within the line
+    newCursorPos += Math.min(relativePos, lines[targetIndex].length);
+
+    // Update cursor position
+    textarea.selectionStart = newCursorPos;
+    textarea.selectionEnd = newCursorPos;
+
+    // Trigger input event
+    textarea.dispatchEvent(new Event('input', { bubbles: true }));
 }
 
 /**

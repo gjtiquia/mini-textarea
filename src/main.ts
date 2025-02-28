@@ -24,6 +24,15 @@ document.addEventListener('DOMContentLoaded', () => {
             }
             // If text is selected, let the default copy behavior work
         }
+
+        // Check for Ctrl+X or Cmd+X with no selection
+        if ((event.ctrlKey || event.metaKey) && event.key === 'x') {
+            if (textarea.selectionStart === textarea.selectionEnd) {
+                event.preventDefault(); // Prevent default cut behavior
+                cutLine(textarea);
+            }
+            // If text is selected, let the default cut behavior work
+        }
     });
 });
 
@@ -72,6 +81,45 @@ function copyLine(textarea: HTMLTextAreaElement): void {
     navigator.clipboard.writeText(lineContent)
         .catch(err => {
             console.error('Failed to copy line: ', err);
+        });
+}
+
+/**
+ * Cuts the current line where the cursor is positioned
+ * Combines copying and deleting efficiently
+ */
+function cutLine(textarea: HTMLTextAreaElement): void {
+    const text = textarea.value;
+    const cursorPos = textarea.selectionStart;
+
+    // Find line boundaries
+    const { start: lineStart, end: lineEnd } = findLineBoundaries(text, cursorPos);
+
+    // Extract the line content for copying
+    const lineContent = text.substring(lineStart, lineEnd);
+
+    // Copy to clipboard
+    navigator.clipboard.writeText(lineContent)
+        .then(() => {
+            // If we're not at the end of the text, include the newline character in the deletion
+            let adjustedLineEnd = lineEnd;
+            if (lineEnd < text.length) {
+                adjustedLineEnd++;
+            }
+
+            // Delete the line
+            const newText = text.substring(0, lineStart) + text.substring(adjustedLineEnd);
+            textarea.value = newText;
+
+            // Set cursor position to the start of the line that was below the deleted line
+            textarea.selectionStart = lineStart;
+            textarea.selectionEnd = lineStart;
+
+            // Trigger input event to ensure any listeners are notified of the change
+            textarea.dispatchEvent(new Event('input', { bubbles: true }));
+        })
+        .catch(err => {
+            console.error('Failed to cut line: ', err);
         });
 }
 

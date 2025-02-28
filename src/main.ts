@@ -40,7 +40,29 @@ document.addEventListener('DOMContentLoaded', () => {
             moveCurrentLine(textarea, event.key === 'ArrowUp' ? 'up' : 'down');
         }
     });
+
+    // Initialize keyboard shortcuts tooltip
+    initShortcutsTooltip();
 });
+
+/**
+ * Initializes the keyboard shortcuts tooltip
+ */
+function initShortcutsTooltip(): void {
+    const tooltipElement = document.getElementById('shortcuts-tooltip');
+    if (tooltipElement) {
+        // Define keyboard shortcuts here for easy editing
+        const shortcuts = [
+            'Ctrl+Shift+K: Delete line',
+            'Ctrl+C (no selection): Copy line',
+            'Ctrl+X (no selection): Cut line',
+            'Alt+↑/↓: Move line up/down'
+        ];
+
+        // Set the tooltip content
+        tooltipElement.title = 'Keyboard Shortcuts:\n' + shortcuts.join('\n');
+    }
+}
 
 /**
  * Deletes the current line where the cursor is positioned

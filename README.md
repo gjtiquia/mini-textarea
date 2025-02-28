@@ -2,7 +2,7 @@
 
 a fast, simple &lt;textarea/&gt; that just works
 
-https://mini-textarea.netlify.app/
+https://minitextarea.gjt.io/
 
 this project is set up with [Vite](https://vite.dev/) using the TypeScript Vanilla template.
 
@@ -27,5 +27,5 @@ pnpm preview
 
 ## TODO
 
-- [ ] proper domain
+- [x] proper domain
 - [ ] PWA setup

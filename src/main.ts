@@ -33,27 +33,18 @@ document.addEventListener('DOMContentLoaded', () => {
 function deleteLine(textarea: HTMLTextAreaElement): void {
     const text = textarea.value;
     const selectionStart = textarea.selectionStart;
-    const selectionEnd = textarea.selectionEnd;
 
-    // Find the start of the current line
-    let lineStart = selectionStart;
-    while (lineStart > 0 && text[lineStart - 1] !== '\n') {
-        lineStart--;
-    }
-
-    // Find the end of the current line
-    let lineEnd = selectionEnd;
-    while (lineEnd < text.length && text[lineEnd] !== '\n') {
-        lineEnd++;
-    }
+    // Find line boundaries
+    const { start: lineStart, end: lineEnd } = findLineBoundaries(text, selectionStart);
 
     // If we're not at the end of the text, include the newline character in the deletion
+    let adjustedLineEnd = lineEnd;
     if (lineEnd < text.length) {
-        lineEnd++;
+        adjustedLineEnd++;
     }
 
     // Delete the line
-    const newText = text.substring(0, lineStart) + text.substring(lineEnd);
+    const newText = text.substring(0, lineStart) + text.substring(adjustedLineEnd);
     textarea.value = newText;
 
     // Set cursor position to the start of the line that was below the deleted line
@@ -71,6 +62,24 @@ function copyLine(textarea: HTMLTextAreaElement): void {
     const text = textarea.value;
     const cursorPos = textarea.selectionStart;
 
+    // Find line boundaries
+    const { start: lineStart, end: lineEnd } = findLineBoundaries(text, cursorPos);
+
+    // Extract the line content
+    const lineContent = text.substring(lineStart, lineEnd);
+
+    // Copy to clipboard using the Clipboard API without visual feedback
+    navigator.clipboard.writeText(lineContent)
+        .catch(err => {
+            console.error('Failed to copy line: ', err);
+        });
+}
+
+/**
+ * Finds the boundaries of the current line
+ * @returns An object containing the start and end positions of the current line
+ */
+function findLineBoundaries(text: string, cursorPos: number): { start: number, end: number } {
     // Find the start of the current line
     let lineStart = cursorPos;
     while (lineStart > 0 && text[lineStart - 1] !== '\n') {
@@ -83,12 +92,5 @@ function copyLine(textarea: HTMLTextAreaElement): void {
         lineEnd++;
     }
 
-    // Extract the line content
-    const lineContent = text.substring(lineStart, lineEnd);
-
-    // Copy to clipboard using the Clipboard API without visual feedback
-    navigator.clipboard.writeText(lineContent)
-        .catch(err => {
-            console.error('Failed to copy line: ', err);
-        });
+    return { start: lineStart, end: lineEnd };
 }

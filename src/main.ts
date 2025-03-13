@@ -1,4 +1,38 @@
 // Keyboard shortcuts for mini-textarea
+import { registerServiceWorker, setupOfflineListener } from './register-sw';
+
+// Register service worker
+registerServiceWorker();
+
+// Set up offline status indicator
+function setupOfflineStatus() {
+    setupOfflineListener((isOnline) => {
+        const statusElement = document.getElementById('connection-status');
+        if (!statusElement) {
+            // Create status element if it doesn't exist
+            const statusDiv = document.createElement('div');
+            statusDiv.id = 'connection-status';
+            statusDiv.className = 'fixed bottom-4 right-4 px-3 py-1 rounded-md text-white transition-opacity';
+            document.body.appendChild(statusDiv);
+        }
+
+        const statusDiv = document.getElementById('connection-status')!;
+
+        if (!isOnline) {
+            statusDiv.textContent = 'Offline';
+            statusDiv.classList.add('bg-red-500');
+            statusDiv.classList.remove('opacity-0');
+        } else {
+            statusDiv.textContent = 'Online';
+            statusDiv.classList.add('bg-green-500');
+
+            // Hide the online indicator after 3 seconds
+            setTimeout(() => {
+                statusDiv.classList.add('opacity-0');
+            }, 3000);
+        }
+    });
+}
 
 document.addEventListener('DOMContentLoaded', () => {
     const textarea = document.querySelector('textarea');
@@ -7,6 +41,9 @@ document.addEventListener('DOMContentLoaded', () => {
         console.error('Textarea element not found');
         return;
     }
+
+    // Initialize offline status indicator
+    setupOfflineStatus();
 
     // Add keyboard shortcut event listener
     textarea.addEventListener('keydown', (event) => {

@@ -1,14 +1,3 @@
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
-
-/* Offline indicator styles */
-#connection-status {
-  opacity: 1;
-  transition: opacity 0.5s ease-in-out;
-  z-index: 1000;
-}
-
-#connection-status.opacity-0 {
-  opacity: 0;
-}

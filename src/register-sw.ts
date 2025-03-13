@@ -40,15 +40,4 @@ export function registerServiceWorker() {
     }
 }
 
-// Check if the app is online
-export function isOnline(): boolean {
-    return navigator.onLine;
-}
-
-// Add offline status listener
-export function setupOfflineListener(callback: (isOnline: boolean) => void) {
-    window.addEventListener('online', () => callback(true));
-    window.addEventListener('offline', () => callback(false));
-    // Initial call with current status
-    callback(isOnline());
-} 
+export { };

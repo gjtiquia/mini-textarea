@@ -1,58 +1,8 @@
 // Keyboard shortcuts for mini-textarea
-import { registerServiceWorker, setupOfflineListener } from './register-sw';
+import { registerServiceWorker } from './register-sw';
 
 // Register service worker
 registerServiceWorker();
-
-// Set up offline status indicator
-function setupOfflineStatus() {
-    // Create or get the status element
-    let statusDiv = document.getElementById('connection-status');
-    if (!statusDiv) {
-        statusDiv = document.createElement('div');
-        statusDiv.id = 'connection-status';
-        statusDiv.className = 'fixed bottom-4 right-4 px-4 py-2 rounded-md text-white font-bold shadow-lg z-50 transition-opacity duration-300';
-        document.body.appendChild(statusDiv);
-    }
-
-    // Update the status display
-    const updateStatus = (isOnline: boolean) => {
-        if (!isOnline) {
-            statusDiv!.textContent = '📵 Offline Mode';
-            statusDiv!.classList.add('bg-red-600');
-            statusDiv!.classList.remove('bg-green-600', 'opacity-0');
-        } else {
-            statusDiv!.textContent = '🌐 Online';
-            statusDiv!.classList.add('bg-green-600');
-            statusDiv!.classList.remove('bg-red-600');
-
-            // Hide the online indicator after 3 seconds, but keep it for offline
-            setTimeout(() => {
-                if (navigator.onLine) { // Double-check we're still online
-                    statusDiv!.classList.add('opacity-0');
-                }
-            }, 3000);
-        }
-    };
-
-    // Set up the offline listener with our update function
-    setupOfflineListener(updateStatus);
-
-    // Force update now to show initial state
-    updateStatus(navigator.onLine);
-
-    // Add a click handler to manually check connection
-    statusDiv.addEventListener('click', () => {
-        // Test connection by trying to fetch a small file
-        fetch('/manifest.json', { method: 'HEAD', cache: 'no-store' })
-            .then(() => {
-                updateStatus(true);
-            })
-            .catch(() => {
-                updateStatus(false);
-            });
-    });
-}
 
 document.addEventListener('DOMContentLoaded', () => {
     const textarea = document.querySelector('textarea');
@@ -61,9 +11,6 @@ document.addEventListener('DOMContentLoaded', () => {
         console.error('Textarea element not found');
         return;
     }
-
-    // Initialize offline status indicator
-    setupOfflineStatus();
 
     // Add keyboard shortcut event listener
     textarea.addEventListener('keydown', (event) => {

@@ -7,7 +7,8 @@
 
   <meta name="description" content="a fast, simple textarea that just works">
   <meta name="author" content="GJ Tiquia">
-  <meta name="theme-color" content="#ffffff">
+  <meta name="theme-color" content="#ffffff" media="(prefers-color-scheme: light)">
+  <meta name="theme-color" content="#1c1917" media="(prefers-color-scheme: dark)">
 
   <!-- PWA Meta Tags -->
   <link rel="manifest" href="/manifest.json">
@@ -71,6 +72,10 @@
       // Save preference to localStorage
       const isDark = document.documentElement.classList.contains('dark');
       localStorage.setItem('darkMode', isDark ? 'dark' : 'light');
+
+      // Update theme-color meta tag
+      const themeColor = isDark ? '#1c1917' : '#ffffff';
+      document.querySelector('meta[name="theme-color"]').setAttribute('content', themeColor);
     }
   </script>
 </body>

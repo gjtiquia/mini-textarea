@@ -7,10 +7,9 @@ const CACHE_NAME = 'mini-textarea-cache-v1';
 const INITIAL_CACHED_RESOURCES = [
     '/',
     '/index.html',
-    '/src/main.ts',
-    '/src/style.css',
-    '/favicon.svg',
-    '/manifest.json'
+    '/manifest.json',
+    '/favicon.svg'
+    // We'll dynamically cache other assets as they're requested
 ];
 
 // TypeScript declarations
@@ -25,39 +24,56 @@ self.addEventListener('install', (event: ExtendableEvent) => {
                 return cache.addAll(INITIAL_CACHED_RESOURCES);
             })
     );
+    // Force the waiting service worker to become the active service worker
+    self.skipWaiting();
 });
 
-// Activate event - clean up old caches
+// Activate event - clean up old caches and claim clients
 self.addEventListener('activate', (event: ExtendableEvent) => {
     event.waitUntil(
-        caches.keys().then(cacheNames => {
-            return Promise.all(
-                cacheNames.map(cacheName => {
-                    if (cacheName !== CACHE_NAME) {
-                        console.log('Service Worker: Clearing old cache', cacheName);
-                        return caches.delete(cacheName);
-                    }
-                    return Promise.resolve();
-                })
-            );
-        })
+        Promise.all([
+            // Clean up old caches
+            caches.keys().then(cacheNames => {
+                return Promise.all(
+                    cacheNames.map(cacheName => {
+                        if (cacheName !== CACHE_NAME) {
+                            console.log('Service Worker: Clearing old cache', cacheName);
+                            return caches.delete(cacheName);
+                        }
+                        return Promise.resolve();
+                    })
+                );
+            }),
+            // Take control of all clients
+            self.clients.claim()
+        ])
     );
 });
 
 // Fetch event - network first strategy
 self.addEventListener('fetch', (event: FetchEvent) => {
+    // Skip non-GET requests
+    if (event.request.method !== 'GET') return;
+
+    // Skip browser extensions and chrome URLs
+    const url = new URL(event.request.url);
+    if (url.origin !== location.origin) return;
+
+    // Implement network-first strategy
     event.respondWith(
-        // Try network first
         fetch(event.request)
             .then(response => {
                 // Clone the response since it can only be consumed once
                 const responseClone = response.clone();
 
-                // Cache the fresh response
-                caches.open(CACHE_NAME)
-                    .then(cache => {
-                        cache.put(event.request, responseClone);
-                    });
+                // Cache successful responses
+                if (response.ok) {
+                    caches.open(CACHE_NAME)
+                        .then(cache => {
+                            cache.put(event.request, responseClone);
+                            console.log('Service Worker: Cached new resource:', event.request.url);
+                        });
+                }
 
                 return response;
             })
@@ -70,8 +86,8 @@ self.addEventListener('fetch', (event: FetchEvent) => {
                             return cachedResponse;
                         }
 
-                        // If not in cache either, return a fallback
-                        if (event.request.url.indexOf('.html') > -1) {
+                        // If requesting a page, serve the index as fallback
+                        if (event.request.mode === 'navigate') {
                             return caches.match('/index.html') as Promise<Response>;
                         }
 

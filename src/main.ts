@@ -6,31 +6,51 @@ registerServiceWorker();
 
 // Set up offline status indicator
 function setupOfflineStatus() {
-    setupOfflineListener((isOnline) => {
-        const statusElement = document.getElementById('connection-status');
-        if (!statusElement) {
-            // Create status element if it doesn't exist
-            const statusDiv = document.createElement('div');
-            statusDiv.id = 'connection-status';
-            statusDiv.className = 'fixed bottom-4 right-4 px-3 py-1 rounded-md text-white transition-opacity';
-            document.body.appendChild(statusDiv);
-        }
+    // Create or get the status element
+    let statusDiv = document.getElementById('connection-status');
+    if (!statusDiv) {
+        statusDiv = document.createElement('div');
+        statusDiv.id = 'connection-status';
+        statusDiv.className = 'fixed bottom-4 right-4 px-4 py-2 rounded-md text-white font-bold shadow-lg z-50 transition-opacity duration-300';
+        document.body.appendChild(statusDiv);
+    }
 
-        const statusDiv = document.getElementById('connection-status')!;
-
+    // Update the status display
+    const updateStatus = (isOnline: boolean) => {
         if (!isOnline) {
-            statusDiv.textContent = 'Offline';
-            statusDiv.classList.add('bg-red-500');
-            statusDiv.classList.remove('opacity-0');
+            statusDiv!.textContent = '📵 Offline Mode';
+            statusDiv!.classList.add('bg-red-600');
+            statusDiv!.classList.remove('bg-green-600', 'opacity-0');
         } else {
-            statusDiv.textContent = 'Online';
-            statusDiv.classList.add('bg-green-500');
+            statusDiv!.textContent = '🌐 Online';
+            statusDiv!.classList.add('bg-green-600');
+            statusDiv!.classList.remove('bg-red-600');
 
-            // Hide the online indicator after 3 seconds
+            // Hide the online indicator after 3 seconds, but keep it for offline
             setTimeout(() => {
-                statusDiv.classList.add('opacity-0');
+                if (navigator.onLine) { // Double-check we're still online
+                    statusDiv!.classList.add('opacity-0');
+                }
             }, 3000);
         }
+    };
+
+    // Set up the offline listener with our update function
+    setupOfflineListener(updateStatus);
+
+    // Force update now to show initial state
+    updateStatus(navigator.onLine);
+
+    // Add a click handler to manually check connection
+    statusDiv.addEventListener('click', () => {
+        // Test connection by trying to fetch a small file
+        fetch('/manifest.json', { method: 'HEAD', cache: 'no-store' })
+            .then(() => {
+                updateStatus(true);
+            })
+            .catch(() => {
+                updateStatus(false);
+            });
     });
 }
 

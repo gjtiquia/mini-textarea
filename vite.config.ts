@@ -2,7 +2,11 @@ import { defineConfig } from 'vite';
 import { resolve } from 'path';
 
 export default defineConfig({
+    // Base public path - important for service worker scope
+    base: '/',
     build: {
+        // Ensure sourcemaps for easier debugging
+        sourcemap: true,
         rollupOptions: {
             input: {
                 main: resolve(__dirname, 'index.html'),
@@ -15,4 +19,10 @@ export default defineConfig({
             },
         },
     },
+    server: {
+        // PWAs work better with HTTPS, enable if you have certificates
+        // https: true
+    },
+    // Copy manifest and other static assets to build output
+    publicDir: 'public',
 }); 

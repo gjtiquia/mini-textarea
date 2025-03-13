@@ -1,6 +1,6 @@
 {
-    "name": "Mini Textarea",
-    "short_name": "MiniTextarea",
+    "name": "minitextarea",
+    "short_name": "textarea",
     "description": "A fast, simple textarea that just works",
     "id": "/",
     "start_url": "/?source=pwa",

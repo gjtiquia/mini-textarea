@@ -1,3 +1,39 @@
+// Debounce and Local Storage
+const SAVE_DELAY = 2000; // 2 seconds
+const STORAGE_KEY = 'mini-textarea-content';
+
+let saveTimeout: number;
+
+/**
+ * Saves the textarea content to localStorage.
+ * @param textarea The textarea element.
+ */
+function saveToLocalStorage(textarea: HTMLTextAreaElement): void {
+    localStorage.setItem(STORAGE_KEY, textarea.value);
+}
+
+/**
+ * Loads the textarea content from localStorage.
+ * @param textarea The textarea element.
+ */
+function loadFromLocalStorage(textarea: HTMLTextAreaElement): void {
+    const savedContent = localStorage.getItem(STORAGE_KEY);
+    if (savedContent) {
+        textarea.value = savedContent;
+    }
+}
+
+/**
+ * Debounces the saving of textarea content to localStorage.
+ * @param textarea The textarea element.
+ */
+function debouncedSave(textarea: HTMLTextAreaElement): void {
+    clearTimeout(saveTimeout);
+    saveTimeout = window.setTimeout(() => {
+        saveToLocalStorage(textarea);
+    }, SAVE_DELAY);
+}
+
 // Keyboard shortcuts for mini-textarea
 import { registerServiceWorker } from './register-sw';
 
@@ -11,6 +47,14 @@ document.addEventListener('DOMContentLoaded', () => {
         console.error('Textarea element not found');
         return;
     }
+
+    // Load content from localStorage on page load
+    loadFromLocalStorage(textarea);
+
+    // Add event listener for debounced saving
+    textarea.addEventListener('input', () => {
+        debouncedSave(textarea);
+    });
 
     // Add keyboard shortcut event listener
     textarea.addEventListener('keydown', (event) => {
